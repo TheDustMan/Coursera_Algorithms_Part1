@@ -8,9 +8,8 @@ UF::UF(int N) : _ids(N)
     }
 }
 
-int UF::find(int p)
-{
-}
+UF::~UF()
+{}
 
 int UF::count() const
 {

@@ -3,6 +3,9 @@
 
 #include <vector>
 
+/*
+ * Serves as the abstract base class for all UnionFind variations
+ */
 class UF
 {
 public:
@@ -10,6 +13,7 @@ public:
      * Initialize union-find data structure with N objects (0 to N-1)
      */
     UF(int N);
+    virtual ~UF();
 
     /*
      * Add connection between p and q
@@ -24,7 +28,7 @@ public:
     /*
      * Component identifier for p (0 to N-1)
      */
-    virtual int find(int p);
+    virtual int find(int p) = 0;
 
     /*
      * Number of components

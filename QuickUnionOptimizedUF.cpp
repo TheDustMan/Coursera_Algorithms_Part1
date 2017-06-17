@@ -8,6 +8,9 @@ QuickUnionOptimizedUF::QuickUnionOptimizedUF(int N) : QuickUnionUF(N), _sizes(N)
     }
 }
 
+QuickUnionOptimizedUF::~QuickUnionOptimizedUF()
+{}
+
 void QuickUnionOptimizedUF::create_union(int p, int q)
 {
     // Add the smaller tree as a subtree of the larger one to keep the

@@ -1,22 +1,25 @@
 #include <iostream>
 #include <fstream>
+#include <map>
 #include <memory>
 #include <sstream>
 #include <string>
 #include <vector>
+#include <typeinfo>
 
 #include "UF.h"
 #include "QuickFindUF.h"
 #include "QuickUnionUF.h"
 #include "QuickUnionOptimizedUF.h"
 #include "QUOUFTimestamp.h"
+#include "QUOUFCanonical.h"
 
 void print(const std::string& str)
 {
     std::cout << str;
 }
 
-void println(const std::string& str)
+void println(const std::string& str = "")
 {
     print(str);
     std::cout << std::endl;
@@ -46,9 +49,15 @@ int main(int argc, char **argv)
 
     int dataPoints = readDataPoints(infile);
     int dataPointsTS = readDataPoints(infileTS);
-    QuickFindUF qfuf(dataPoints);
-    QuickUnionUF quuf(dataPoints);
-    QuickUnionOptimizedUF quouf(dataPoints);
+
+    std::vector<std::pair<int,int>> findTestData = {{8,9},{3,9},{4,9},{5,7},{6,7},{0,7},{1,7},{2,7}};
+    
+    std::map<std::string, std::unique_ptr<UF>> unionFindVariants;
+    unionFindVariants.insert(std::make_pair("QuickFindUF", std::make_unique<QuickFindUF>(dataPoints)));
+    unionFindVariants.insert(std::make_pair("QuickUnionUF", std::make_unique<QuickUnionUF>(dataPoints)));
+    unionFindVariants.insert(std::make_pair("QuickUnionOptimizedUF", std::make_unique<QuickUnionOptimizedUF>(dataPoints)));
+    unionFindVariants.insert(std::make_pair("QUOUFCanonical", std::make_unique<QUOUFCanonical>(dataPoints)));
+    
     QUOUFTimestamp quoufts(dataPointsTS);
     quoufts.onFullConnection([](int timestamp)
         {
@@ -65,20 +74,36 @@ int main(int argc, char **argv)
             println("Error reading file: " + std::string(ufFile));
             break;
         }
-        if (!qfuf.connected(p, q))
+        for (auto& ufVariant : unionFindVariants)
         {
-            qfuf.create_union(p, q);
-        }
-        if (!quuf.connected(p, q))
-        {
-            quuf.create_union(p, q);
-        }
-        if (!quouf.connected(p, q))
-        {
-            quouf.create_union(p, q);
+            if (!ufVariant.second->connected(p, q))
+            {
+                ufVariant.second->create_union(p, q);
+            }
         }
     }
 
+    for (auto& ufVariant : unionFindVariants)
+    {
+        println("Running tests for class: " + ufVariant.first);
+        for (auto& findTestPair : findTestData)
+        {
+            println("Running \"find\" on input: " + std::to_string(findTestPair.first));
+            int result = ufVariant.second->find(findTestPair.first);
+            println("Result was: " + std::to_string(result));
+            if (result == findTestPair.second)
+            {
+                println(">>>Passed!");
+            }
+            else
+            {
+                println(">>>Failed!");
+            }
+        }
+        println();
+    }
+        
+    
     std::string triplet;
     while (std::getline(infileTS, triplet))
     {

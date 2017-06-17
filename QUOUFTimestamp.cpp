@@ -6,8 +6,10 @@ QUOUFTimestamp::QUOUFTimestamp(int N)
       _timestamps(N),
       _onFullConnection(nullptr)
 {
-
 }
+
+QUOUFTimestamp::~QUOUFTimestamp()
+{}
 
 
 void QUOUFTimestamp::create_union(int p, int q, int timestamp)

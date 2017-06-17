@@ -13,6 +13,7 @@ class QUOUFTimestamp : public QuickUnionOptimizedUF
 {
  public:
     QUOUFTimestamp(int N);
+    virtual ~QUOUFTimestamp();
     virtual void create_union(int p, int q, int timestamp);
     virtual void onFullConnection(std::function<void(int)> f);
  private:
